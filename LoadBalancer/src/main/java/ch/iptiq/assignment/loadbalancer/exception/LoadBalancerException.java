@@ -1,10 +1,6 @@
-package ch.iptiq.assignment.loadbalancer;
+package ch.iptiq.assignment.loadbalancer.exception;
 
 public class LoadBalancerException extends Exception {
-
-    public LoadBalancerException() {
-        super();
-    }
 
     public LoadBalancerException(String message) {
         super(message);

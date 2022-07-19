@@ -1,5 +1,7 @@
 package ch.iptiq.assignment.loadbalancer;
 
+import ch.iptiq.assignment.loadbalancer.exception.NoAvailableProvidersException;
+import ch.iptiq.assignment.loadbalancer.exception.ProviderLimitExceededException;
 import ch.iptiq.assignment.loadbalancer.strategy.RandomLoadBalancerStrategy;
 import ch.iptiq.assignment.provider.DefaultProvider;
 import ch.iptiq.assignment.provider.Provider;
@@ -19,7 +21,11 @@ class DefaultLoadBalancerTest {
     @Test
     void getThrowsExceptionIfProvidersAreMissing() {
         underTest = new DefaultLoadBalancer(new RandomLoadBalancerStrategy());
-        assertThrows(LoadBalancerException.class, () -> underTest.get());
+        underTest.start();
+
+        assertThrows(NoAvailableProvidersException.class, () -> underTest.send());
+
+        underTest.stop();
     }
 
     @Test
@@ -37,6 +43,6 @@ class DefaultLoadBalancerTest {
             providers.add(new DefaultProvider());
         }
 
-        assertThrows(LoadBalancerException.class, () -> underTest.registerProviders(providers));
+        assertThrows(ProviderLimitExceededException.class, () -> underTest.registerProviders(providers));
     }
 }

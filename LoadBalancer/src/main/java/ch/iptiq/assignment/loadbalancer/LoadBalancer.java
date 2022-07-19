@@ -1,11 +1,13 @@
 package ch.iptiq.assignment.loadbalancer;
 
+import ch.iptiq.assignment.loadbalancer.exception.LoadBalancerException;
 import ch.iptiq.assignment.provider.Provider;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface LoadBalancer {
-    String get() throws LoadBalancerException;
+    Future<String> send() throws LoadBalancerException;
 
     void registerProviders(List<Provider> providers) throws LoadBalancerException;
 
@@ -18,4 +20,6 @@ public interface LoadBalancer {
     void start();
 
     void stop();
+
+    void setProviderCapacity(int providerCapacity);
 }
