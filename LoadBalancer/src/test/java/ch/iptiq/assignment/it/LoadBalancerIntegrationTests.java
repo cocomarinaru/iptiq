@@ -7,7 +7,6 @@ import ch.iptiq.assignment.loadbalancer.strategy.RandomLoadBalancerStrategy;
 import ch.iptiq.assignment.loadbalancer.strategy.RoundRobinBalancerStrategy;
 import ch.iptiq.assignment.provider.DefaultProvider;
 import ch.iptiq.assignment.provider.Provider;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package ch.iptiq.assignment.loadbalancer.strategy;
 
-import ch.iptiq.assignment.provider.Provider;
+import ch.iptiq.assignment.loadbalancer.RegisteredProvider;
 
 import java.util.List;
 import java.util.Random;
@@ -8,7 +8,7 @@ import java.util.Random;
 public class RandomLoadBalancerStrategy implements LoadBalanceStrategy {
 
     @Override
-    public Provider pickFrom(List<Provider> providers) {
+    public RegisteredProvider pickFrom(List<RegisteredProvider> providers) {
         int randomIndex = new Random().nextInt(0, providers.size());
         return providers.get(randomIndex);
     }

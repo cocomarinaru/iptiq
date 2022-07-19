@@ -1,11 +1,10 @@
 package ch.iptiq.assignment.loadbalancer.strategy;
 
-import ch.iptiq.assignment.provider.Provider;
+import ch.iptiq.assignment.loadbalancer.RegisteredProvider;
 
 import java.util.List;
 
 public class RoundRobinBalancerStrategy implements LoadBalanceStrategy {
-
     private int lastProviderIndex;
 
     public RoundRobinBalancerStrategy() {
@@ -13,9 +12,9 @@ public class RoundRobinBalancerStrategy implements LoadBalanceStrategy {
     }
 
     @Override
-    public Provider pickFrom(List<Provider> providers) {
+    public RegisteredProvider pickFrom(List<RegisteredProvider> providers) {
         int index = providers.size() == lastProviderIndex + 1 ? 0 : lastProviderIndex + 1;
-        Provider provider = providers.get(index);
+        RegisteredProvider provider = providers.get(index);
         lastProviderIndex = index;
         return provider;
     }

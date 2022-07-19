@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public class DefaultProvider implements Provider {
 
+    private boolean isAlive = true;
     private final String id;
 
     public DefaultProvider() {
@@ -17,6 +18,16 @@ public class DefaultProvider implements Provider {
     }
 
     @Override
+    public boolean isAlive() {
+        return this.isAlive;
+    }
+
+    @Override
+    public void setIsAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    @Override
     public String getId() {
         return id;
     }
@@ -26,16 +37,4 @@ public class DefaultProvider implements Provider {
         return this.id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DefaultProvider that = (DefaultProvider) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
