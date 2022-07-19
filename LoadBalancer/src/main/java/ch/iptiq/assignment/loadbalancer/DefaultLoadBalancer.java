@@ -49,7 +49,7 @@ public class DefaultLoadBalancer implements LoadBalancer {
             return response;
         };
         parallelRequestsCount.incrementAndGet();
-        return executor.schedule(request, 2, TimeUnit.SECONDS);
+        return executor.schedule(request, 1, TimeUnit.SECONDS);
 
     }
 

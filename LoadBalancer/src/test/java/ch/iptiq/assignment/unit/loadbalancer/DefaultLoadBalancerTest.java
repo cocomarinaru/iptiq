@@ -1,5 +1,6 @@
-package ch.iptiq.assignment.loadbalancer;
+package ch.iptiq.assignment.unit.loadbalancer;
 
+import ch.iptiq.assignment.loadbalancer.DefaultLoadBalancer;
 import ch.iptiq.assignment.loadbalancer.exception.NoAvailableProvidersException;
 import ch.iptiq.assignment.loadbalancer.exception.ProviderLimitExceededException;
 import ch.iptiq.assignment.loadbalancer.strategy.RandomLoadBalancerStrategy;

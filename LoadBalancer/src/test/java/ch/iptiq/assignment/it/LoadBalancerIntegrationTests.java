@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,12 +40,12 @@ public class LoadBalancerIntegrationTests {
 
         loadBalancer.registerProviders(List.of(provider1, provider2, provider3));
 
-        String actualResponse1 = loadBalancer.send().get();
-        String actualResponse2 = loadBalancer.send().get();
+        Future<String> actualResponse1 = loadBalancer.send();
+        Future<String> actualResponse2 = loadBalancer.send();
 
         List<String> possibleResponses = List.of(provider1.get(), provider2.get(), provider3.get());
-        assertTrue(possibleResponses.contains(actualResponse1));
-        assertTrue(possibleResponses.contains(actualResponse2));
+        assertTrue(possibleResponses.contains(actualResponse1.get()));
+        assertTrue(possibleResponses.contains(actualResponse2.get()));
     }
 
     @Test
@@ -55,15 +56,15 @@ public class LoadBalancerIntegrationTests {
 
         loadBalancer.registerProviders(List.of(provider1, provider2, provider3));
 
-        String actualResponse1 = loadBalancer.send().get();
-        String actualResponse2 = loadBalancer.send().get();
-        String actualResponse3 = loadBalancer.send().get();
-        String actualResponse4 = loadBalancer.send().get();
+        Future<String> actualResponse1 = loadBalancer.send();
+        Future<String> actualResponse2 = loadBalancer.send();
+        Future<String> actualResponse3 = loadBalancer.send();
+        Future<String> actualResponse4 = loadBalancer.send();
 
-        assertEquals(provider1.get(), actualResponse1);
-        assertEquals(provider2.get(), actualResponse2);
-        assertEquals(provider3.get(), actualResponse3);
-        assertEquals(provider1.get(), actualResponse4);
+        assertEquals(provider1.get(), actualResponse1.get());
+        assertEquals(provider2.get(), actualResponse2.get());
+        assertEquals(provider3.get(), actualResponse3.get());
+        assertEquals(provider1.get(), actualResponse4.get());
     }
 
     @Test
@@ -75,23 +76,23 @@ public class LoadBalancerIntegrationTests {
 
         loadBalancer.registerProviders(List.of(provider1, provider2, provider3));
 
-        String actualResponse1 = loadBalancer.send().get();
-        String actualResponse2 = loadBalancer.send().get();
-        String actualResponse3 = loadBalancer.send().get();
+        Future<String> actualResponse1 = loadBalancer.send();
+        Future<String> actualResponse2 = loadBalancer.send();
+        Future<String> actualResponse3 = loadBalancer.send();
 
-        assertEquals(provider1.getId(), actualResponse1);
-        assertEquals(provider2.getId(), actualResponse2);
-        assertEquals(provider3.getId(), actualResponse3);
+        assertEquals(provider1.getId(), actualResponse1.get());
+        assertEquals(provider2.getId(), actualResponse2.get());
+        assertEquals(provider3.getId(), actualResponse3.get());
 
         loadBalancer.exclude(provider1);
 
-        String actualResponse4 = loadBalancer.send().get();
-        String actualResponse5 = loadBalancer.send().get();
-        String actualResponse6 = loadBalancer.send().get();
+        Future<String> actualResponse4 = loadBalancer.send();
+        Future<String> actualResponse5 = loadBalancer.send();
+        Future<String> actualResponse6 = loadBalancer.send();
 
-        assertEquals(provider2.getId(), actualResponse4);
-        assertEquals(provider3.getId(), actualResponse5);
-        assertEquals(provider2.getId(), actualResponse6);
+        assertEquals(provider2.getId(), actualResponse4.get());
+        assertEquals(provider3.getId(), actualResponse5.get());
+        assertEquals(provider2.getId(), actualResponse6.get());
     }
 
     @Test
@@ -103,23 +104,23 @@ public class LoadBalancerIntegrationTests {
 
         loadBalancer.registerProviders(List.of(provider1, provider2));
 
-        String actualResponse1 = loadBalancer.send().get();
-        String actualResponse2 = loadBalancer.send().get();
-        String actualResponse3 = loadBalancer.send().get();
+        Future<String> actualResponse1 = loadBalancer.send();
+        Future<String> actualResponse2 = loadBalancer.send();
+        Future<String> actualResponse3 = loadBalancer.send();
 
-        assertEquals(provider1.getId(), actualResponse1);
-        assertEquals(provider2.getId(), actualResponse2);
-        assertEquals(provider1.getId(), actualResponse3);
+        assertEquals(provider1.getId(), actualResponse1.get());
+        assertEquals(provider2.getId(), actualResponse2.get());
+        assertEquals(provider1.getId(), actualResponse3.get());
 
         loadBalancer.include(provider3);
 
-        String actualResponse4 = loadBalancer.send().get();
-        String actualResponse5 = loadBalancer.send().get();
-        String actualResponse6 = loadBalancer.send().get();
+        Future<String> actualResponse4 = loadBalancer.send();
+        Future<String> actualResponse5 = loadBalancer.send();
+        Future<String> actualResponse6 = loadBalancer.send();
 
-        assertEquals(provider2.getId(), actualResponse4);
-        assertEquals(provider3.getId(), actualResponse5);
-        assertEquals(provider1.getId(), actualResponse6);
+        assertEquals(provider2.getId(), actualResponse4.get());
+        assertEquals(provider3.getId(), actualResponse5.get());
+        assertEquals(provider1.getId(), actualResponse6.get());
 
     }
 
@@ -132,24 +133,24 @@ public class LoadBalancerIntegrationTests {
 
         loadBalancer.registerProviders(List.of(provider1, provider2));
 
-        String actualResponse1 = loadBalancer.send().get();
-        String actualResponse2 = loadBalancer.send().get();
-        String actualResponse3 = loadBalancer.send().get();
+        Future<String> actualResponse1 = loadBalancer.send();
+        Future<String> actualResponse2 = loadBalancer.send();
+        Future<String> actualResponse3 = loadBalancer.send();
 
-        assertEquals(provider1.getId(), actualResponse1);
-        assertEquals(provider2.getId(), actualResponse2);
-        assertEquals(provider1.getId(), actualResponse3);
+        assertEquals(provider1.getId(), actualResponse1.get());
+        assertEquals(provider2.getId(), actualResponse2.get());
+        assertEquals(provider1.getId(), actualResponse3.get());
 
         provider3.setIsAlive(false);
         loadBalancer.include(provider3);
 
-        String actualResponse4 = loadBalancer.send().get();
-        String actualResponse5 = loadBalancer.send().get();
-        String actualResponse6 = loadBalancer.send().get();
+        Future<String> actualResponse4 = loadBalancer.send();
+        Future<String> actualResponse5 = loadBalancer.send();
+        Future<String> actualResponse6 = loadBalancer.send();
 
-        assertEquals(provider2.getId(), actualResponse4);
-        assertEquals(provider1.getId(), actualResponse5);
-        assertEquals(provider2.getId(), actualResponse6);
+        assertEquals(provider2.getId(), actualResponse4.get());
+        assertEquals(provider1.getId(), actualResponse5.get());
+        assertEquals(provider2.getId(), actualResponse6.get());
 
     }
 }
