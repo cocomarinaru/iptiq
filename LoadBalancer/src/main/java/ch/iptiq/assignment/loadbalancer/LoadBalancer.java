@@ -14,4 +14,8 @@ public interface LoadBalancer {
     void include(Provider provider) throws LoadBalancerException;
 
     void check();
+
+    void start();
+
+    void stop();
 }

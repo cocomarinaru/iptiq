@@ -8,7 +8,7 @@ public class RegisteredProvider {
 
     public RegisteredProvider(Provider provider) {
         this.provider = provider;
-        this.status = new ProviderStatus(false,0);
+        this.status = new ProviderStatus(!provider.isAlive());
     }
 
     public Provider getProvider() {

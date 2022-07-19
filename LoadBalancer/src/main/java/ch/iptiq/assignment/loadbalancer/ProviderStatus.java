@@ -4,9 +4,9 @@ public class ProviderStatus {
     private boolean isExcluded;
     private int successfulConsecutiveHeartBeats;
 
-    public ProviderStatus(boolean isExcluded, int successfulConsecutiveHeartBeats) {
+    public ProviderStatus(boolean isExcluded) {
         this.isExcluded = isExcluded;
-        this.successfulConsecutiveHeartBeats = successfulConsecutiveHeartBeats;
+        this.successfulConsecutiveHeartBeats = 0;
     }
 
     public boolean isExcluded() {

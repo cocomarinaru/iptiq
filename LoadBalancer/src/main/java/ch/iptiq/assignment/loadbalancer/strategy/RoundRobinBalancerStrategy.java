@@ -13,7 +13,7 @@ public class RoundRobinBalancerStrategy implements LoadBalanceStrategy {
 
     @Override
     public RegisteredProvider pickFrom(List<RegisteredProvider> providers) {
-        int index = providers.size() == lastProviderIndex + 1 ? 0 : lastProviderIndex + 1;
+        int index = providers.size() <= lastProviderIndex + 1 ? 0 : lastProviderIndex + 1;
         RegisteredProvider provider = providers.get(index);
         lastProviderIndex = index;
         return provider;

@@ -5,20 +5,20 @@ import ch.iptiq.assignment.heartbeat.HeartBeatChecker;
 import ch.iptiq.assignment.loadbalancer.strategy.LoadBalanceStrategy;
 import ch.iptiq.assignment.provider.Provider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class DefaultLoadBalancer implements LoadBalancer {
     private final int PROVIDERS_LIMIT = 10;
-    private final List<RegisteredProvider> providers = new ArrayList<>();
-
-    private final Map<Provider, ProviderStatus>  registeredProviders = new ConcurrentHashMap<>();
+    private final Map<String, RegisteredProvider> registeredProviders = Collections.synchronizedMap(new LinkedHashMap<>());
     private LoadBalanceStrategy algorithm;
     private final HeartBeatChecker heartBeatChecker = new DefaultHeartBeatChecker();
+
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     public DefaultLoadBalancer(LoadBalanceStrategy algorithm) {
         Objects.requireNonNull(algorithm);
@@ -27,7 +27,7 @@ public class DefaultLoadBalancer implements LoadBalancer {
 
     @Override
     public String get() throws LoadBalancerException {
-        if (providers.isEmpty()) {
+        if (registeredProviders.isEmpty()) {
             throw new LoadBalancerException("Missing registered provides");
         }
         RegisteredProvider provider = algorithm.pickFrom(getAliveProviders());
@@ -44,46 +44,58 @@ public class DefaultLoadBalancer implements LoadBalancer {
             throw new LoadBalancerException("To many providers, limit is " + PROVIDERS_LIMIT);
         }
 
-        List<RegisteredProvider> registeredProviders = providers.stream()
-                .map(RegisteredProvider::new)
-                .collect(Collectors.toList());
+        this.registeredProviders.clear();
+        providers.forEach(provider -> this.registeredProviders.put(provider.getId(), new RegisteredProvider(provider)));
+    }
 
-        this.providers.clear();
-        this.providers.addAll(registeredProviders);
+    public void start() {
+        executor.scheduleAtFixedRate(this::check, 0, 2, TimeUnit.SECONDS);
+    }
+
+    public void stop() {
+        executor.shutdownNow();
     }
 
     @Override
     public void exclude(Provider excludedProvider) {
-        changeProviderStatus(excludedProvider, true);
+        changeProviderStatus(excludedProvider.getId(), true);
     }
 
     @Override
     public void include(Provider includeProvider) throws LoadBalancerException {
-        if (providers.size() == PROVIDERS_LIMIT) {
+        if (registeredProviders.size() == PROVIDERS_LIMIT) {
             throw new LoadBalancerException("To many providers, limit is " + PROVIDERS_LIMIT);
         }
-        changeProviderStatus(includeProvider, false);
+
+        RegisteredProvider provider = registeredProviders.get(includeProvider.getId());
+
+        if (provider == null) {
+            registeredProviders.put(includeProvider.getId(), new RegisteredProvider(includeProvider));
+        } else {
+            changeProviderStatus(includeProvider.getId(), !includeProvider.isAlive());
+        }
+
     }
 
+
     public void check() {
-        for (RegisteredProvider provider : providers) {
+        for (RegisteredProvider provider : registeredProviders.values()) {
             boolean check = heartBeatChecker.check(provider.getProvider());
             updateStatus(provider.getStatus(), check);
             System.out.printf("Provider %s is alive: %b\n", provider.getProvider().getId(), check);
         }
     }
 
-    private void changeProviderStatus(Provider excludedProvider, boolean excluded) {
-        providers.stream()
-                .filter(provider -> provider.getProvider().getId().equals(excludedProvider.getId()))
-                .forEach(provider -> {
-                    provider.getStatus().setExcluded(excluded);
-                    provider.getStatus().setSuccessfulConsecutiveHeartBeats(0);
-                });
+    private void changeProviderStatus(String providerId, boolean excluded) {
+        RegisteredProvider provider = registeredProviders.get(providerId);
+        if (provider != null) {
+            provider.getStatus().setExcluded(excluded);
+            provider.getStatus().setSuccessfulConsecutiveHeartBeats(0);
+        }
     }
 
     private List<RegisteredProvider> getAliveProviders() {
-        return this.providers.stream()
+        return this.registeredProviders.values().stream()
                 .filter(provider -> !provider.getStatus().isExcluded())
                 .collect(Collectors.toList());
     }
@@ -104,8 +116,4 @@ public class DefaultLoadBalancer implements LoadBalancer {
         }
     }
 
-    //for testing
-    public List<RegisteredProvider> getProviders() {
-        return providers;
-    }
 }
