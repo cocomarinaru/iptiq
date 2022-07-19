@@ -12,6 +12,11 @@ public class DefaultProvider implements Provider {
         this.id = UUID.randomUUID().toString();
     }
 
+    public DefaultProvider(boolean isAlive) {
+        this.id = UUID.randomUUID().toString();
+        this.isAlive = isAlive;
+    }
+
     @Override
     public String get() {
         return id;

@@ -28,9 +28,13 @@ public class DefaultLoadBalancer implements LoadBalancer {
     @Override
     public String get() throws LoadBalancerException {
         if (registeredProviders.isEmpty()) {
-            throw new LoadBalancerException("Missing registered provides");
+            throw new LoadBalancerException("Missing registered providers");
         }
-        RegisteredProvider provider = algorithm.pickFrom(getAliveProviders());
+        List<RegisteredProvider> aliveProviders = getAliveProviders();
+        if (aliveProviders.isEmpty()) {
+            throw new LoadBalancerException("No alive providers");
+        }
+        RegisteredProvider provider = algorithm.pickFrom(aliveProviders);
         return provider.getProvider().get();
     }
 
@@ -76,7 +80,6 @@ public class DefaultLoadBalancer implements LoadBalancer {
         }
 
     }
-
 
     public void check() {
         for (RegisteredProvider provider : registeredProviders.values()) {
